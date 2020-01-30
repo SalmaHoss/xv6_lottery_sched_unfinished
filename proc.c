@@ -544,15 +544,19 @@ int cps ()
 struct proc *p;
 sti();
 acquire(&ptable.lock);
-cprintf("name \t pid \t state \t\t tickets \t \n");
+cprintf("used \t pid  \t\t tickets \t ticks \n");
 for( p = ptable.proc ; p < &ptable.proc[NPROC] ; p++){
-if ( p->state == SLEEPING)
-cprintf ("%s \t %d \t SLEEPING \t %d \n " , p->name , p->pid,p->slice);
-else if ( p->state == RUNNING)
-cprintf ("%s \t %d \t RUNNING \t  %d \n " , p->name , p->pid,p->slice);
-else if ( p->state == RUNNABLE)
-cprintf ("%s \t %d \t RUNNABLE \t %d \n " , p->name , p->pid,p->slice);
-}
+if ( p->state == SLEEPING){
+p->used = 0;
+cprintf ("%d \t %d \t \t %d \n " , p->used , p->pid,p->slice,p->ticks);}
+else if ( p->state == RUNNING){
+p->used = 1;
+cprintf ("%d \t %d \t \t  %d \n " , p->used , p->pid,p->slice,p->ticks);}
+
+else if ( p->state == RUNNABLE){
+p->used = 0;
+cprintf ("%d \t %d \t \t %d \n " , p->used, p->pid,p->slice,p->ticks);
+}}
 release(&ptable.lock);
 return 22;
 }
